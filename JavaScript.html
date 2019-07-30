@@ -1,0 +1,200 @@
+<script>
+
+//loaded from server on page load
+var data = {
+  'randomizer_choices':{},
+  'names_corpora':{}
+};
+
+
+//event handlers
+function onload(e) {
+  setButtonsDisabled(true);
+  displayWarning('Please wait - loading data');
+  google.script.run.withSuccessHandler(onloadSuccess).withFailureHandler(onloadFailure).getData();
+}
+
+function handleClick(endpoint) {
+  clearWarning();
+  displayHeader(endpoint);
+  displayOutput('Generating...');
+  handleRandomize(endpoint).then(onRandomizeSuccess, onRandomizeFailure);
+}
+
+function refresh(e) {
+  google.script.run.showSidebar();
+}
+
+function onloadSuccess(result) {
+  setButtonsDisabled(false);
+  clearWarning();
+  displayOutput('');
+  data = result;
+}
+
+function onloadFailure(error) {
+  displayWarning('Failed to load data - please try again');
+  displayOutput('');
+}
+
+function handleRandomize(endpoint) {
+  return new Promise((resolve, reject) => {
+    try {
+      data['user_vars'] = {}; //reset user-defined variables
+      var input = data['randomizer_choices'][endpoint][0]; //each endpoint is an array of length one
+      if (input.toString().trim().length == 0) throw ('Endpoint "' + endpoint + '" is empty');
+      var output = randomize(input);
+      resolve(output);
+    } catch(e) {
+      reject(e);
+    }
+  });
+}
+
+function onRandomizeSuccess(output) {
+  displayOutput(output);
+}
+
+function onRandomizeFailure(error) {
+  displayWarning('ERROR: ' + error);
+  displayOutput('');
+}
+
+function randomize(input) {
+  //search for curly-bracketed syntax, strip brackets and parse inner text
+  var output = input.replace(/{([^{]+)}/g, function(match, p1, offset, string) {
+    try {
+      return parse(p1);
+    } catch (e) {
+      displayWarning('ERROR: ' + e);
+      return match;
+    }
+  });
+  //repeat until no change
+  if (input == output) {
+    return output;
+  } else {
+    return randomize(output);
+  }
+}
+
+function parse(input) {
+  /*
+  determine format of input (outer brackets have been stripped)
+    {key}
+    {[list|of|some options]}
+    {#0-100}
+    {@varname:key}
+    {@varname:[list|of|some options]}
+    {@varname:#0-100}
+    {@varname}
+  */
+  var match;
+  
+  //match @varname:statement
+  match = input.match(/^@(\w+):(\w+)$/);
+  if (match) {
+    var varname = match[1];
+    var value = parse(match[2]);
+    data['user_vars'][varname] = value;
+    return value;
+  }
+  
+  //match @varname
+  match = input.match(/^@(\w+)$/);
+  if (match) {
+    var varname = match[1];
+    if (data['user_vars'].hasOwnProperty(varname)) {
+      return data['user_vars'][varname];
+    } else {
+      throw ('the variable "@' + varname + '" is undefined');
+    }
+  }
+  
+  //match [list|of|some options]
+  match = input.match(/^\[([\W\w]+)]$/);
+  if (match) {
+    var choices = match[1].split('|');
+    return choices[Math.floor(Math.random() * choices.length)];
+  }
+  
+  //match #0-100
+  match = input.match(/^#(\d+)-(\d+)$/);
+  if (match) {
+    var min = parseInt(match[1]);
+    var max = parseInt(match[2]);
+    return (Math.floor(Math.random() * (max - min + 1) ) + min).toString(); //result is inclusive
+  }
+  
+  //match label
+  match = input.match(/^(\w+)$/);
+  if (match) {
+    var key = match[1];
+    if (data['randomizer_choices'].hasOwnProperty(key)) {
+      //get random choice
+      var choices = data['randomizer_choices'][key];
+      if (choices.length == 0) throw ('the label "' + key + '" does not define any options');
+      return choices[Math.floor(Math.random() * choices.length)];
+    } else if (data['names_corpora'].hasOwnProperty(key)) {
+      //generate name
+      var corpus = data['names_corpora'][key];
+      var name;
+      do {
+        name = generateName(corpus);
+      } while(!name.match(/[aeiouy]+/)); //ensure name contains at least one vowel
+      name = capitalize(name);
+      return name;
+    } else {
+      throw ('the label "' + key + '" is undefined');
+    }
+  }
+  
+  //no match
+  throw ('invalid syntax: "' + input + '"');
+}
+
+function generateName(corpus) {
+  //choose random starting characters
+  var name = corpus['<s>'][Math.floor(Math.random() * corpus['<s>'].length)];
+  var keyLength = name.length;
+  //choose next character at random until sentinel symbol encountered
+  while (true) {
+    var nextKey = name.substring(name.length - keyLength);
+    var next = corpus[nextKey][Math.floor(Math.random() * corpus[nextKey].length)];
+    if (next != '</s>') name += next;
+    else break;
+  }
+  return name;
+}
+
+function capitalize(str) {
+  return str.replace(/(\w)([\w]*)/g, function(match, p1, p2, offset, string) {
+    return p1.toUpperCase() + p2;
+  });
+}
+
+function displayHeader(header) {
+  document.getElementById('header').innerHTML = header;
+}
+
+function displayOutput(output) {
+  document.getElementById('output').innerHTML = output;
+}
+
+function displayWarning(msg) {
+  if (!document.getElementById('warning').innerHTML.includes(msg)) {
+    document.getElementById('warning').innerHTML += msg + "\n";
+  }
+}
+
+function clearWarning() {
+  document.getElementById('warning').innerHTML = '';
+}
+
+function setButtonsDisabled(bool) {
+  var buttons = document.getElementsByClassName('endpoint');
+  for (var i = 0; i < buttons.length; i++) {
+    buttons[i].disabled = bool;
+  }
+}
+</script>

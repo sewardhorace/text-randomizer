@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <link rel="stylesheet" href="https://ssl.gstatic.com/docs/script/css/add-ons1.css">
+  <?!= include('Stylesheet'); ?>
+</head>
+<body class="sidebar-body" onload="onload()">
+
+  <div class="endpoints">
+  
+    <? if (endpoints.length > 0) { ?>
+  
+      <? for (var i = 0; i < endpoints.length; i++) { ?>
+      
+      <div class="endpoint-wrapper">
+        <input type="button" class="endpoint" value="<?= endpoints[i] ?>" onclick="handleClick(<?= endpoints[i] ?>)" />
+      </div>
+      
+      <? } ?>
+      
+    <? } else { ?>
+    
+      <div class="error">No headers found in sheet "Endpoints"</div>
+      
+    <? } ?>
+    
+    <div class="endpoint-wrapper">
+      <input type="button" class="action" value="Reload data" onclick="refresh()" />
+    </div>
+    
+  </div>
+  
+  <div class="display">
+  
+    <div id="warning" class="error"></div>
+    <div id="header"></div>
+    <div id="output"></div>
+    
+  </div>
+  <?!= include('JavaScript'); ?>
+</body>
+</html>

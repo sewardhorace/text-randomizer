@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <link rel="stylesheet" href="https://ssl.gstatic.com/docs/script/css/add-ons1.css">
+  <?!= include('Stylesheet'); ?>
+</head>
+<body>
+  <div>
+    Text Randomizer converts a spreadsheet into a customizable random text generator.
+    <br>
+    <br>
+    There are four main tools for generating random text: making a <b>random selection</b>, generating a <b>random number</b>, making a <b>one-time selection</b>, 
+    and assigning random results to a <b>variable</b>.  Each utilizes curly braces <b>{ }</b> (note that curly braces <b>{ }</b> should never be placed inside another set of curly braces.)
+    <br>
+    <br>
+    Any number of sheets may be used, but two special sheet names are reserved - <b>Endpoints</b> and <b>Names</b>. These are discussed below.
+    <br>
+    <br>
+    <hr>
+    <br>
+    Use column headers to define a label for a <b>random selection</b> of possible options. Labels should be written without spaces. For example: "rare_gem"
+    <br>
+    Use the rows beneath a given label to define the possible options for that label:
+    <br>
+    <br>
+    <table>
+      <tr>
+        <th><b>rare_gem</b></th>
+      </tr>
+      <tr>
+        <td>diamond</td>
+      </tr>
+      <tr>
+        <td>ruby</td>
+      </tr>
+      <tr>
+        <td>black opal</td>
+      </tr>
+      <tr>
+        <td>sapphire</td>
+      </tr>
+      <tr>
+        <td>moonstone</td>
+      </tr>
+    </table>
+    <br>
+    Once a <b>random selection</b> has been defined, it can be used in other options by surrounding the label with curly braces <b>{ }</b>
+    <br>
+    <br>
+    <table>
+      <tr>
+        <th>rare_gem</th>
+        <th>treasure</th>
+      </tr>
+      <tr>
+        <td>diamond</td>
+        <td>a magic ring</td>
+      </tr>
+      <tr>
+        <td>ruby</td>
+        <td>a sparkling <b>{rare_gem}</b></td>
+      </tr>
+      <tr>
+        <td>black opal</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>sapphire</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>moonstone</td>
+        <td></td>
+      </tr>
+    </table>
+    <br>
+    Use a pound <b>#</b> character to generate a <b>random number</b>. The minimum and maximum possible values are separated by a dash <b>-</b> . 
+    Note that negative numbers cannot be generated (as a workaround, simply place a "-" sign before the curly brackets).
+    <br>
+    <br>
+    <table>
+      <tr>
+        <th>rare_gem</th>
+        <th>treasure</th>
+      </tr>
+      <tr>
+        <td>diamond</td>
+        <td>a magic ring</td>
+      </tr>
+      <tr>
+        <td>ruby</td>
+        <td>a sparkling {rare_gem}</td>
+      </tr>
+      <tr>
+        <td>black opal</td>
+        <td><b>{#100-300}</b> silver coins</td>
+      </tr>
+      <tr>
+        <td>sapphire</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>moonstone</td>
+        <td></td>
+      </tr>
+    </table>
+    <br>
+    Define a <b>one-time selection</b> by placing a list of options inside square braces <b>[ ]</b> separated by vertical bars <b>|</b> . 
+    This is useful for situations where defining a whole column of options would be overkill.
+    <br>
+    <br>
+    <table>
+      <tr>
+        <th>rare_gem</th>
+        <th>treasure</th>
+      </tr>
+      <tr>
+        <td>diamond</td>
+        <td>a magic ring</td>
+      </tr>
+      <tr>
+        <td>ruby</td>
+        <td>a sparkling {rare_gem}</td>
+      </tr>
+      <tr>
+        <td>black opal</td>
+        <td>{#100-300} <b>{[grubby copper|silver|gold]}</b> coins</td>
+      </tr>
+      <tr>
+        <td>sapphire</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>moonstone</td>
+        <td></td>
+      </tr>
+    </table>
+    <br>
+    Lastly, define a <b>variable</b> using the at <b>@</b> character. The first time a variable is used it must be assigned a value by following it with a colon <b>:</b> 
+    and any of the generator options defined above - a <b>random selection</b> label, a <b>random number</b>, or a <b>one-time selection</b>. Then the randomly assigned value can be reused by referencing the variable name. 
+    Variable names cannot have spaces.
+    <br>
+    <br>
+    <table>
+      <tr>
+        <th>rare_gem</th>
+        <th>treasure</th>
+      </tr>
+      <tr>
+        <td>diamond</td>
+        <td>a magic ring</td>
+      </tr>
+      <tr>
+        <td>ruby</td>
+        <td>a sparkling {rare_gem}</td>
+      </tr>
+      <tr>
+        <td>black opal</td>
+        <td>{#200-300} {[grubby copper|silver|gold]} coins</td>
+      </tr>
+      <tr>
+        <td>sapphire</td>
+        <td>a crown with a small <b>{@crown_gem:rare_gem}</b> on each point, and a huge <b>{@crown_gem}</b> in the center</td>
+      </tr>
+      <tr>
+        <td>moonstone</td>
+        <td></td>
+      </tr>
+    </table>
+    <br>
+    There are two special Sheets that Text Randomizer treats differently - <b>Endpoints</b> and <b>Names</b>.
+    <br>
+    <br>
+    <hr>
+    <br>
+    A sheet named <b>Endpoints</b> is required. It is where the top-level random generators are defined which will appear as buttons 
+     in the Text Randomizer interface. 
+    Using the example labels above, the following example endpoints might be defined:
+    <br>
+    <br>
+    <table>
+      <tr>
+        <th>Single Treasure</th>
+        <th>Treasure Hoard</th>
+      </tr>
+      <tr>
+        <td>{treasure}</td>
+        <td>{treasure}, </td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>{treasure}, </td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>and {treasure}</td>
+      </tr>
+    </table>
+    <br>
+    When the Text Randomizer interface is opened, two buttons will be present - a button for "Single Treasure", which generates a single random treasure, and a button for "Treasure Hoard", which generates three random treasures. 
+    The <b>Endpoints</b> sheet has a couple of key usage differences:
+    <ol>
+      <li>The headers, which will determine the button names in the interface, can have spaces and punctuation.</li>
+      <li>Multiple rows are used to generate a multi-line result, not to provide multiple possible options.</li>
+    </ol>
+    <br>
+    <hr>
+    <br>
+    Inclusion of a sheet called <b>Names</b> is optional. Use the <b>Names</b> sheet to randomly generate new words or names. 
+    As in a regular sheet, each column header defines a label that can be used in curly braces <b>{ }</b> to produce a randomized result. 
+    However, the rows below the header consist of sample names that will be 
+    used to generate new names, rather than a list of predefined options. For example:
+    <br>
+    <br>
+    <table>
+      <tr>
+        <th>sword_name</th>
+        <th>monster_name</th>
+      </tr>
+      <tr>
+        <td>excalibur</td>
+        <td>balrog</td>
+      </tr>
+      <tr>
+        <td>callandor</td>
+        <td>dracula</td>
+      </tr>
+      <tr>
+        <td>longclaw</td>
+        <td>godzilla</td>
+      </tr>
+      <tr>
+        <td>stormbringer</td>
+        <td>falkor</td>
+      </tr>
+      <tr>
+        <td>glamdring</td>
+        <td>modron</td>
+      </tr>
+    </table>
+    <br>
+    Labels defined in the <b>Names</b> sheet can be used just like other <b>random selection</b> labels.
+    <br>
+    <br>
+    <table>
+      <tr>
+        <th>rare_gem</th>
+        <th>treasure</th>
+      </tr>
+      <tr>
+        <td>diamond</td>
+        <td>a magic ring</td>
+      </tr>
+      <tr>
+        <td>ruby</td>
+        <td>a sparkling {rare_gem}</td>
+      </tr>
+      <tr>
+        <td>black opal</td>
+        <td>{#200-300} {[grubby copper|silver|gold]} coins</td>
+      </tr>
+      <tr>
+        <td>sapphire</td>
+        <td>a crown with a small {@crown_gem:rare_gem} on each point, and a huge {@crown_gem} in the center</td>
+      </tr>
+      <tr>
+        <td>moonstone</td>
+        <td>the fabled sword <b>{sword_name}</b></td>
+      </tr>
+    </table>
+    <br>
+    Be aware that name generator results are dependent on the quality and quantity of sample names provided. 
+    A minimum of 30 sample names is suggested, and 100 or more are recommended for best results. 
+    If too few samples are provided, it is possible that the generator may produce results identical to the samples names.
+    <br>
+    <br>
+    <hr>
+    <br>
+    Select <b>Load examples</b> from the Text Randomizer menu to see these examples in action.
+    <br>
+    </div>
+</body>
+</html>
